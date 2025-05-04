@@ -1,6 +1,6 @@
 namespace TravelAgency.DTOs;
 
-public class TripDTO
+public class CreateTripRequest
 {
     public int IdTrip { get; set; }
     public string Name { get; set; }

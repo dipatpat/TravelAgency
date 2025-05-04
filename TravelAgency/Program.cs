@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Data.SqlClient;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using TravelAgency.Middlewares;
+using TravelAgency.Repositories;
+using TravelAgency.Services;
 
 namespace TravelAgency;
 
@@ -13,7 +17,9 @@ public class Program
         // Add services to the container.
         builder.Services.AddAuthorization();
         builder.Services.AddControllers();
-
+        builder.Services.AddScoped<ITripsService, TripsService>(); //register dependency
+        builder.Services.AddScoped<ITripsRepository, TripsRepository>(); 
+            
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         builder.Services.AddSwaggerGen(c =>
@@ -44,6 +50,8 @@ public class Program
         {
             app.MapOpenApi();
         }
+
+        app.UseGlobalExceptionHandling(); //registering my custom middleware
 
         app.UseSwagger();
         
