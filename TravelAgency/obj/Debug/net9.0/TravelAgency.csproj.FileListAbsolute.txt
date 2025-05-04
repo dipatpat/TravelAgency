@@ -69,3 +69,7 @@
 /Users/pati/projects/pjatk/apdb/TravelAgency/TravelAgency/obj/Debug/net9.0/TravelAgency.pdb
 /Users/pati/projects/pjatk/apdb/TravelAgency/TravelAgency/obj/Debug/net9.0/TravelAgency.genruntimeconfig.cache
 /Users/pati/projects/pjatk/apdb/TravelAgency/TravelAgency/obj/Debug/net9.0/ref/TravelAgency.dll
+/Users/pati/projects/pjatk/apdb/TravelAgency/TravelAgency/bin/Debug/net9.0/Swashbuckle.AspNetCore.Swagger.dll
+/Users/pati/projects/pjatk/apdb/TravelAgency/TravelAgency/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+/Users/pati/projects/pjatk/apdb/TravelAgency/TravelAgency/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
+/Users/pati/projects/pjatk/apdb/TravelAgency/TravelAgency/obj/Debug/net9.0/TravelAgency.sourcelink.json
