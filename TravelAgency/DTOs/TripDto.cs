@@ -8,8 +8,8 @@ public class TripDto
     public string Name { get; set; }
     public string Description { get; set; }
     public int MaxPeople { get; set; }
-    public DateTime? DepartureDate { get; set; }
-    public DateTime? ArrivalDate { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
     
     public List<string> Countries { get; set; }
 }

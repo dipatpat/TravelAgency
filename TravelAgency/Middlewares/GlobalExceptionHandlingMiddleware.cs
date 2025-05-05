@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
+using TravelAgency.Exceptions;
 
 namespace TravelAgency.Middlewares;
 
@@ -30,8 +31,17 @@ public class GlobalExceptionHandlingMiddleware
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        
+        if (exception is NotFoundException)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+        }
+        else
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
+        }
+       
         var response = new
         {
             status = "Error",

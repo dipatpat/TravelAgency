@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using TravelAgency.DTOs;
+using TravelAgency.Exceptions;
 using TravelAgency.Models;
 using TravelAgency.Repositories;
 
@@ -22,8 +23,8 @@ public class TripsService : ITripsService
            Name = trip.Name,
            Description = trip.Description,
            MaxPeople = trip.MaxPeople,
-           DepartureDate = trip.DateFrom,
-           ArrivalDate = trip.DateTo,
+           StartDate = trip.DateFrom,
+           EndDate = trip.DateTo,
            Countries = new List<string>()
        }).ToList();
        
@@ -36,15 +37,29 @@ public class TripsService : ITripsService
        return dto;
     }
 
-    public async Task<int> CreateTripAsync(CreateTripRequest request, CancellationToken cancellationToken)
+   
+
+    public async Task<TripDto> GetTripByIdAsync(int id, CancellationToken cancellationToken)
     {
-//check if customer exists  
-//ic fustomer is null throw new argument exception customer not found 
-//var trip = await _tripsRepository.CreateTripAsync(request, cancellationToken);
-//check if trip with such id exists 
-//if trip exists, check how many people have been assigned there 
-//if max people already assigned throw conflict repsonse , argument exception max limit reached
-//await Trips_Clients add new client
-        return 1;
+        var trip = await _tripsRepository.GetTripByIdAsync(id, cancellationToken);
+        if (trip == null)
+        {
+            throw new NotFoundException($"Trip with {id} not found");
+        }
+        var tripDto = new TripDto
+        {
+            IdTrip = trip.IdTrip,
+            Name = trip.Name,
+            Description = trip.Description,
+            MaxPeople = trip.MaxPeople,
+            StartDate = trip.DateFrom,
+            EndDate = trip.DateTo,
+            Countries = new List<string>()
+
+        };
+        
+        var countries = await _tripsRepository.GetTripsCountriesAsync(cancellationToken, trip.IdTrip);
+        tripDto.Countries.AddRange(countries);
+        return tripDto;
     }
 }

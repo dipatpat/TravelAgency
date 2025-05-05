@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using TravelAgency.DTOs;
 using TravelAgency.Models;
+using TravelAgency.Services;
 
 namespace TravelAgency.Controllers;
 
@@ -8,46 +10,37 @@ namespace TravelAgency.Controllers;
 [ApiController]
 public class ClientsController : ControllerBase
 {
-    private string _connectionString;
+    private readonly IClientService _clientService;   
 
-    public ClientsController(IConfiguration config)
+    public ClientsController(IClientService clientService)
     {
-        _connectionString = config.GetConnectionString("DefaultConnection");
+        _clientService = clientService;
     }
-
-
-    [HttpGet]
-    public async Task<IActionResult> GetTripsAsync(CancellationToken cancellationToken)
+    
+    [HttpGet("{id}/trips")]
+    public async Task<IActionResult> GetClientsTripAsync(CancellationToken cancellationToken, int id)
     {
-        await using var con = new SqlConnection(_connectionString); //establishing connection
-        await using var cmd = new SqlCommand(); //represents queries
-        cmd.Connection = con;
-        cmd.CommandText = "SELECT * FROM Trip";
-        await con.OpenAsync(cancellationToken);
-
-        cancellationToken.ThrowIfCancellationRequested();
-        SqlDataReader reader = await cmd.ExecuteReaderAsync(cancellationToken);
-        var trips = new List<Trip>();
-        while (await reader.ReadAsync())
-        {
-            int tripId = (int)reader["IdTrip"]; //[] fetching column name
-            string tripName = (string)reader["Name"];
-            string tripDescription = (string)reader["Description"];
-            int maxPeople = (int)reader["MaxPeople"];
-
-            var trip = new Trip
-            {
-                IdTrip = tripId,
-                Name = tripName,
-                Description = tripDescription,
-                MaxPeople = maxPeople,
-            };
-
-            trips.Add(trip);
-
-        }
-
-        con.DisposeAsync(); //it's good to call this method at the end when i finish working with database when we are finished to release resources
+        var trips = await _clientService.GetClientTripsAsync(cancellationToken, id);
         return Ok(trips);
     }
+    [HttpGet("{id}")]
+    [ActionName("GetClientByIdAsync")]
+    public async Task<IActionResult> GetClientByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        var client = await _clientService.GetClientByIdAsync(id, cancellationToken);
+        return Ok(client);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateClientAsync(CreateClientRequest request, CancellationToken cancellationToken)
+    {
+        var clientId = await _clientService.CreateClientAsync(request, cancellationToken);
+        var client = await _clientService.GetClientByIdAsync(clientId, cancellationToken);
+        return CreatedAtAction(
+            "GetClientByIdAsync",
+            new {id = clientId},
+            client);
+    }
+        
+        
 }

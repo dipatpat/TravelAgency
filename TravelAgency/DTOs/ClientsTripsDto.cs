@@ -1,6 +1,6 @@
 namespace TravelAgency.DTOs;
 
-public class CreateTripRequest
+public class ClientsTripsDto
 {
     public int IdTrip { get; set; }
     public string Name { get; set; }
@@ -8,4 +8,8 @@ public class CreateTripRequest
     public int MaxPeople { get; set; }
     public DateTime? DepartureDate { get; set; }
     public DateTime? ArrivalDate { get; set; }
+    
+    //public List<string> Countries { get; set; }
+    public int registrationInformation  { get; set; }
+    public int? paymentInformation { get; set; }
 }

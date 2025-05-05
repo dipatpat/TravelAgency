@@ -70,6 +70,43 @@ public class TripsRepository : ITripsRepository
             string countryName = (string) reader["Name"];
             countries.Add(countryName);
         }
+        con.DisposeAsync(); 
         return countries;
     }
+
+    public async Task<Trip> GetTripByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        await using var con = new SqlConnection(_connectionString); 
+        await using var cmd = new SqlCommand(); 
+        cmd.Connection = con;
+        cmd.CommandText = "SELECT  * FROM Trip where IdTrip = @id";
+        cmd.Parameters.AddWithValue("@id", id);
+        await con.OpenAsync(cancellationToken);
+        
+        cancellationToken.ThrowIfCancellationRequested();
+        SqlDataReader reader = await cmd.ExecuteReaderAsync(cancellationToken);
+        if (await reader.ReadAsync())
+        {
+            int tripId = (int) reader["IdTrip"]; 
+            string tripName = (string) reader["Name"];
+            string tripDescription = (string) reader["Description"];
+            int maxPeople = (int) reader["MaxPeople"];
+            DateTime arrivalDate = (DateTime) reader["DateFrom"];
+            DateTime departureDate = (DateTime) reader["DateTo"];
+
+            var trip = new Trip
+            {
+                IdTrip = tripId,
+                Name = tripName,
+                Description = tripDescription,
+                MaxPeople = maxPeople,
+                DateFrom = arrivalDate,
+                DateTo = departureDate
+            };
+
+            return trip;
+        }
+        return null;
+    }
 }
+
