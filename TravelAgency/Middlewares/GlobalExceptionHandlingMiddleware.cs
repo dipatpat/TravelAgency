@@ -36,6 +36,11 @@ public class GlobalExceptionHandlingMiddleware
         {
             context.Response.StatusCode = StatusCodes.Status404NotFound;
         }
+        else if (exception is ConflictException)
+
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+        }
         else
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;

@@ -108,5 +108,19 @@ public class TripsRepository : ITripsRepository
         }
         return null;
     }
+
+    public async Task<int> GetTotalPeopleRegisteredForATripAsync(int tripId, CancellationToken cancellationToken)
+    {
+        await using var con = new SqlConnection(_connectionString);
+        await using var cmd = new SqlCommand();
+        cmd.Connection = con;
+        cmd.CommandText = "select count(*) from Client_Trip where IdTrip = @tripId;";
+        cmd.Parameters.AddWithValue("@tripId", tripId);
+        await con.OpenAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        var result = await cmd.ExecuteScalarAsync(cancellationToken);
+        return Convert.ToInt32(result);
+    }
+
 }
 

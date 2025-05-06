@@ -10,10 +10,14 @@ public class ClientService : IClientService
 {
 
     private static IClientRepository _clientRepository;
+    private static ITripsRepository _tripsRepository;
+    private static IClientTripRepository _clientTripRepository;
 
-    public ClientService(IClientRepository clientRepository)
+    public ClientService(IClientRepository clientRepository, ITripsRepository tripsRepository, IClientTripRepository clientTripRepository)
     {
         _clientRepository = clientRepository;
+        _tripsRepository = tripsRepository;
+        _clientTripRepository = clientTripRepository;
     }
     
     public async Task<IEnumerable<ClientsTripsDto>> GetClientTripsAsync(CancellationToken cancellationToken, int ClientId)
@@ -59,5 +63,35 @@ public class ClientService : IClientService
     {
         var clientId = await _clientRepository.CreateClientAsync(request, cancellationToken);
         return clientId;
+    }
+
+    public async Task RegisterClientForTripAsync(int clientId, int tripId, CancellationToken cancellationToken)
+    {
+        var client = await _clientRepository.GetClientByIdAsync(cancellationToken, clientId);
+        if (client == null)
+        {
+            throw new NotFoundException($"Client with id {clientId} not found");
+        }
+        var trip = await _tripsRepository.GetTripByIdAsync(tripId, cancellationToken);
+        if (trip == null)
+        {
+            throw new NotFoundException($"Trip with id {tripId} not found");
+        }
+        var maxPeoplePerTrip = trip.MaxPeople;
+        var registeredPeopleForATrip = 
+            await _tripsRepository.GetTotalPeopleRegisteredForATripAsync(tripId, cancellationToken);
+
+        if (registeredPeopleForATrip >= maxPeoplePerTrip)
+        {
+            throw new ConflictException($"Trip with id {tripId} is already full. You can't register for it.");
+        }
+        
+        var isAlreadyRegistered = await _clientTripRepository.IsClientRegisteredForTripAsync(clientId, tripId, cancellationToken);
+        if (isAlreadyRegistered)
+        {
+            throw new ConflictException($"Client with id {clientId} has already registered for trip with id {tripId}");
+        }
+        
+        await _clientTripRepository.RegisterClientForTripAsync(tripId, clientId, cancellationToken);
     }
 }

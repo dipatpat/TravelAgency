@@ -41,6 +41,13 @@ public class ClientsController : ControllerBase
             new {id = clientId},
             client);
     }
+
+    [HttpPut("{idClient}/trips/{tripId}")]
+    public async Task<IActionResult> RegisterClientForTripAsync(int idClient, int tripId, CancellationToken cancellationToken)
+    {
+        await _clientService.RegisterClientForTripAsync(idClient, tripId, cancellationToken);
+        return Ok($"Client with id {idClient} has been registered for a trip with id {tripId}");
+    }
         
         
 }

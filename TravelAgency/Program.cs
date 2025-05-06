@@ -21,6 +21,7 @@ public class Program
         builder.Services.AddScoped<ITripsRepository, TripsRepository>(); 
         builder.Services.AddScoped<IClientService, ClientService>();
         builder.Services.AddScoped<IClientRepository, ClientRepository>();
+        builder.Services.AddScoped<IClientTripRepository, ClientTripRepository>();
             
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();

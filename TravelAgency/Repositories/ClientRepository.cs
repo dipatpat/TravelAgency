@@ -134,9 +134,11 @@ public class ClientRepository : IClientRepository
         int clientId = Convert.ToInt32(result);
         return clientId;
     }
+}
+
 
         
-}
+
 
 
 
