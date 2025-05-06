@@ -10,4 +10,6 @@ public interface IClientService
     Task<int> CreateClientAsync(CreateClientRequest request, CancellationToken cancellationToken);
     Task RegisterClientForTripAsync(int clientId, int tripId, CancellationToken cancellationToken);
     
+    Task RemoveClientFromTripAsync(int clientId, int tripId, CancellationToken cancellationToken);
+    
 }

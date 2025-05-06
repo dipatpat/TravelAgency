@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.Data.SqlClient;
 
 namespace TravelAgency.Repositories;
@@ -31,18 +32,37 @@ public class ClientTripRepository : IClientTripRepository
         await cmd.ExecuteNonQueryAsync(cancellationToken);
 
     }
-    public async Task<bool> IsClientRegisteredForTripAsync(int idTrip,
-        int idClient, CancellationToken cancellationToken)
+    public async Task<bool> IsClientRegisteredForTripAsync(int idClient, int idTrip,
+        CancellationToken cancellationToken)
     {
         await using var con = new SqlConnection(_connectionString);
         await using var cmd = new SqlCommand();
         cmd.Connection = con;
         cmd.CommandText = @"SELECT COUNT(*) FROM CLIENT_TRIP WHERE IdClient = @idClient AND IdTrip = @idTrip;";
+        Console.WriteLine($"[DEBUG SQL] Executing: SELECT COUNT(*) FROM CLIENT_TRIP WHERE IdClient = {idClient} AND IdTrip = {idTrip}");
         cmd.Parameters.AddWithValue("@idTrip", idTrip);
         cmd.Parameters.AddWithValue("@idClient", idClient);
         await con.OpenAsync(cancellationToken);
         var result = await cmd.ExecuteScalarAsync(cancellationToken);
         int count = Convert.ToInt32(result);
         return count > 0;
+    }
+
+    public async Task RemoveClientFromTripAsync(int idTrip, int idClient, CancellationToken cancellationToken)
+    {
+        await using var con = new SqlConnection(_connectionString);
+        await using var cmd = new SqlCommand();
+        cmd.Connection = con;
+        cmd.CommandText = @"DELETE FROM CLIENT_TRIP WHERE IdClient = @idClient AND IdTrip = @idTrip;";
+        cmd.Parameters.Add("@idTrip", SqlDbType.Int).Value = idTrip;
+        cmd.Parameters.Add("@idClient", SqlDbType.Int).Value = idClient;
+        await con.OpenAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        int rowsAffected = await cmd.ExecuteNonQueryAsync(cancellationToken);
+        if (rowsAffected == 0)
+        {
+            throw new InvalidOperationException("Delete failed: No matching record found.");
+        }
+        
     }
 }

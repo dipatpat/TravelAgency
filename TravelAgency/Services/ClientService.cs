@@ -87,6 +87,7 @@ public class ClientService : IClientService
         }
         
         var isAlreadyRegistered = await _clientTripRepository.IsClientRegisteredForTripAsync(clientId, tripId, cancellationToken);
+        Console.WriteLine($"[DEBUG] Checking registration for clientId={clientId}, tripId={tripId}: {isAlreadyRegistered}");
         if (isAlreadyRegistered)
         {
             throw new ConflictException($"Client with id {clientId} has already registered for trip with id {tripId}");
@@ -94,4 +95,25 @@ public class ClientService : IClientService
         
         await _clientTripRepository.RegisterClientForTripAsync(tripId, clientId, cancellationToken);
     }
+
+    public async Task RemoveClientFromTripAsync(int clientId, int tripId, CancellationToken cancellationToken)
+    {
+        var client = await _clientRepository.GetClientByIdAsync(cancellationToken, clientId);
+        if (client == null)
+        {
+            throw new NotFoundException($"Client with id {clientId} not found");
+        }
+        var trip = await _tripsRepository.GetTripByIdAsync(tripId, cancellationToken);
+        if (trip == null)
+        {
+            throw new NotFoundException($"Trip with id {tripId} not found");
+        }
+        var isAlreadyRegistered = await _clientTripRepository.IsClientRegisteredForTripAsync(clientId, tripId, cancellationToken);
+        if (!isAlreadyRegistered)
+        {
+            throw new ConflictException($"Client with id {clientId} is not registered for a trip with id {tripId}");
+        }
+        await _clientTripRepository.RemoveClientFromTripAsync(tripId, clientId, cancellationToken);
+    }
+
 }
