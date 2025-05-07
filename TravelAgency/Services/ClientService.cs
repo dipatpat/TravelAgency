@@ -9,9 +9,9 @@ namespace TravelAgency.Services;
 public class ClientService : IClientService
 {
 
-    private static IClientRepository _clientRepository;
-    private static ITripsRepository _tripsRepository;
-    private static IClientTripRepository _clientTripRepository;
+    private readonly IClientRepository _clientRepository;
+    private readonly ITripsRepository _tripsRepository;
+    private readonly IClientTripRepository _clientTripRepository;
 
     public ClientService(IClientRepository clientRepository, ITripsRepository tripsRepository, IClientTripRepository clientTripRepository)
     {
@@ -20,53 +20,83 @@ public class ClientService : IClientService
         _clientTripRepository = clientTripRepository;
     }
     
-    public async Task<IEnumerable<ClientsTripsDto>> GetClientTripsAsync(CancellationToken cancellationToken, int ClientId)
+    public async Task<IEnumerable<ClientsTripsDto>> GetClientTripsAsync(CancellationToken cancellationToken, int clientId)
     {
-        var client = await _clientRepository.GetClientByIdAsync(cancellationToken, ClientId);
+        if (clientId <= 0)
+        {
+            throw new BadRequestException("ClientId must be greater than zero.");
+        }
+        
+        var client = await _clientRepository.GetClientByIdAsync(cancellationToken, clientId);
         if (client == null)
         {
-            throw new NotFoundException($"Client with id {ClientId} not found");
+            throw new NotFoundException($"Client with id {clientId} not found");
         }
-        var trips = await _clientRepository.GetClientsTripsAsync(cancellationToken, ClientId);
-        if (trips == null)
+        var tripsList = (await _clientRepository.GetClientsTripsAsync(cancellationToken, clientId)).ToList();
+        if (!tripsList.Any())
         {
-            throw new NotFoundException($"Client with id {ClientId} has no trips");
+            throw new NotFoundException($"Client with id {clientId} has no trips");
         }
-        var dto = trips.Select(trip => new ClientsTripsDto
+        var dto = new List<ClientsTripsDto>();
+        foreach (var trip in tripsList)
         { 
-            IdTrip = trip.IdTrip,
-            Name = trip.Name,
-            Description = trip.Description,
-            MaxPeople = trip.MaxPeople,
-            DepartureDate = trip.DateFrom,
-            ArrivalDate = trip.DateTo,
-        }).ToList();
-       
-        foreach (var trip in dto)
-        {
-            int registeredAt = await _clientRepository.GetRegisterdForTripAsync(cancellationToken, trip.IdTrip, ClientId);
-            int? paymentDate = await _clientRepository.GetPaymentDateForTripAsync(cancellationToken, trip.IdTrip, ClientId);
-            trip.registrationInformation = registeredAt;
-            trip.paymentInformation = paymentDate;
+            int registeredAt = await _clientRepository.GetRegisterdForTripAsync(cancellationToken, trip.IdTrip, clientId);
+            int? paymentDate = await _clientRepository.GetPaymentDateForTripAsync(cancellationToken, trip.IdTrip, clientId);
+            dto.Add(new ClientsTripsDto
+            {
+                IdTrip = trip.IdTrip,
+                Name = trip.Name,
+                Description = trip.Description,
+                MaxPeople = trip.MaxPeople,
+                DepartureDate = trip.DateFrom,
+                ArrivalDate = trip.DateTo,
+                registrationInformation = registeredAt,
+                paymentInformation = paymentDate
+            });
         }
-       
+        
         return dto;
     }
 
-    public async Task<Client> GetClientByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<Client> GetClientByIdAsync(int clientId, CancellationToken cancellationToken)
     {
-        var client = await _clientRepository.GetClientByIdAsync(cancellationToken, id);
+        if (clientId <= 0)
+        {
+            throw new BadRequestException("ClientId must be greater than zero.");
+        }
+
+        var client = await _clientRepository.GetClientByIdAsync(cancellationToken, clientId);
         return client;
     }
 
     public async Task<int> CreateClientAsync(CreateClientRequest request, CancellationToken cancellationToken)
     {
+        var fields = new Dictionary<string, string?>
+        {
+            { "First name", request.FirstName },
+            { "Last name", request.LastName },
+            { "Email", request.Email }
+        };
+
+        foreach (var (fieldName, value) in fields)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new BadRequestException($"{fieldName} is required.");
+            if (value.Length > 120)
+                throw new BadRequestException($"{fieldName} cannot exceed 120 characters.");
+        }
+        
         var clientId = await _clientRepository.CreateClientAsync(request, cancellationToken);
         return clientId;
     }
 
     public async Task RegisterClientForTripAsync(int clientId, int tripId, CancellationToken cancellationToken)
     {
+        if (clientId <= 0 || tripId <= 0)
+        {
+            throw new BadRequestException("ClientId and TripId must be greater than zero.");
+        }
+
         var client = await _clientRepository.GetClientByIdAsync(cancellationToken, clientId);
         if (client == null)
         {
@@ -98,6 +128,11 @@ public class ClientService : IClientService
 
     public async Task RemoveClientFromTripAsync(int clientId, int tripId, CancellationToken cancellationToken)
     {
+        if (clientId <= 0 || tripId <= 0)
+        {
+            throw new BadRequestException("ClientId and TripId must be greater than zero.");
+        }
+
         var client = await _clientRepository.GetClientByIdAsync(cancellationToken, clientId);
         if (client == null)
         {

@@ -87,13 +87,8 @@ public class ClientRepository : IClientRepository
         cmd.Parameters.AddWithValue("@idTrip", idTrip);
         cmd.Parameters.AddWithValue("@idClient", idClient);
         await con.OpenAsync(cancellationToken);
-        SqlDataReader reader = await cmd.ExecuteReaderAsync(cancellationToken);
-        if (await reader.ReadAsync(cancellationToken))
-        {
-            return (int)reader["RegisteredAt"];
-        }
-
-        return 0;
+        var result = await cmd.ExecuteScalarAsync(cancellationToken);
+        return result != null ? Convert.ToInt32(result) : 0;
     }
 
     public async Task<int?> GetPaymentDateForTripAsync(CancellationToken cancellationToken, int idTrip, int idClient)
@@ -105,17 +100,26 @@ public class ClientRepository : IClientRepository
         cmd.Parameters.AddWithValue("@idTrip", idTrip);
         cmd.Parameters.AddWithValue("@idClient", idClient);
         await con.OpenAsync(cancellationToken);
-        SqlDataReader reader = await cmd.ExecuteReaderAsync(cancellationToken);
-        if (await reader.ReadAsync(cancellationToken))
-        {
-            return reader["PaymentDate"] != DBNull.Value ? (int?)reader["PaymentDate"] : null;
-        }
-
-        return null;
+        var result = await cmd.ExecuteScalarAsync(cancellationToken);
+        return result != DBNull.Value ? Convert.ToInt32(result) : null;
     }
 
     public async Task<int> CreateClientAsync(CreateClientRequest clientrequest, CancellationToken cancellationToken)
     {
+        var requiredFields = new (string Value, string Name)[]
+        {
+            (clientrequest.FirstName, "FirstName"),
+            (clientrequest.LastName, "LastName"),
+            (clientrequest.Email, "Email"),
+            (clientrequest.Telephone, "Telephone"),
+            (clientrequest.Pesel, "Pesel")
+        };
+        foreach (var (value, name) in requiredFields)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException($"{name} is required");
+        }
+        
         await using var con = new SqlConnection(_connectionString);
         await using var cmd = new SqlCommand();
         cmd.Connection = con;

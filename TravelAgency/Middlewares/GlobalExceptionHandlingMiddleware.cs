@@ -41,6 +41,15 @@ public class GlobalExceptionHandlingMiddleware
         {
             context.Response.StatusCode = StatusCodes.Status409Conflict;
         }
+        else if (exception is BadRequestException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+        
+        else if (exception is FeatureNotImplementedException)
+        {
+            context.Response.StatusCode = StatusCodes.Status501NotImplemented;
+        }
         else
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;

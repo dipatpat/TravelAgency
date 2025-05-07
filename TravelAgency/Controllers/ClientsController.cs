@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using TravelAgency.DTOs;
+using TravelAgency.Exceptions;
 using TravelAgency.Models;
 using TravelAgency.Services;
 
@@ -55,6 +56,10 @@ public class ClientsController : ControllerBase
         await _clientService.RemoveClientFromTripAsync(idClient, tripId, cancellationToken);
         return Ok($"Client with id {idClient} has been removed from a trip with id {tripId}");
     }
-        
-        
+
+    [HttpGet("future-feature")]
+    public IActionResult NotImplementedFeature()
+    {
+        throw new FeatureNotImplementedException("This feature is not implemented yet.");
+    }
 }

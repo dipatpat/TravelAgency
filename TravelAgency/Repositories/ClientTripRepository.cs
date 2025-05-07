@@ -39,7 +39,6 @@ public class ClientTripRepository : IClientTripRepository
         await using var cmd = new SqlCommand();
         cmd.Connection = con;
         cmd.CommandText = @"SELECT COUNT(*) FROM CLIENT_TRIP WHERE IdClient = @idClient AND IdTrip = @idTrip;";
-        Console.WriteLine($"[DEBUG SQL] Executing: SELECT COUNT(*) FROM CLIENT_TRIP WHERE IdClient = {idClient} AND IdTrip = {idTrip}");
         cmd.Parameters.AddWithValue("@idTrip", idTrip);
         cmd.Parameters.AddWithValue("@idClient", idClient);
         await con.OpenAsync(cancellationToken);
