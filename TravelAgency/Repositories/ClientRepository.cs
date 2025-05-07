@@ -13,6 +13,7 @@ public class ClientRepository : IClientRepository
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
 
+    //to obtain all trips of the client, needed for 2. GET /api/clients/{id}/trips
     public async Task<IEnumerable<Trip>> GetClientsTripsAsync(CancellationToken cancellationToken, int ClientId)
     {
         await using var con = new SqlConnection(_connectionString);
@@ -28,7 +29,7 @@ public class ClientRepository : IClientRepository
         var trips = new List<Trip>();
         while (await reader.ReadAsync(cancellationToken))
         {
-            int tripId = (int)reader["IdTrip"]; //[] fetching column name
+            int tripId = (int)reader["IdTrip"]; 
             string tripName = (string)reader["Name"];
             string tripDescription = (string)reader["Description"];
             int maxPeople = (int)reader["MaxPeople"];
@@ -49,7 +50,10 @@ public class ClientRepository : IClientRepository
 
         return trips;
     }
-
+    
+    //to fetch client by id, needed for 2. GET /api/clients/{id}/trips, 
+    //4. PUT /api/clients/{id}/trips/{tripId} 
+    //5. DELETE /api/clients/{id}/trips/{tripId}
     public async Task<Client?> GetClientByIdAsync(CancellationToken cancellationToken, int id)
     {
         await using var con = new SqlConnection(_connectionString);
@@ -78,6 +82,7 @@ public class ClientRepository : IClientRepository
         return null;
     }
 
+    //to be able to obtain field Register for to create a Client_TripDTO
     public async Task<int> GetRegisterdForTripAsync(CancellationToken cancellationToken, int idTrip, int idClient)
     {
         await using var con = new SqlConnection(_connectionString);
@@ -91,6 +96,7 @@ public class ClientRepository : IClientRepository
         return result != null ? Convert.ToInt32(result) : 0;
     }
 
+    //to be able to obtain field PaymentDate  to create a Client_TripDTO
     public async Task<int?> GetPaymentDateForTripAsync(CancellationToken cancellationToken, int idTrip, int idClient)
     {
         await using var con = new SqlConnection(_connectionString);
@@ -104,6 +110,7 @@ public class ClientRepository : IClientRepository
         return result != DBNull.Value ? Convert.ToInt32(result) : null;
     }
 
+    //to implement 3. POST /api/clients
     public async Task<int> CreateClientAsync(CreateClientRequest clientrequest, CancellationToken cancellationToken)
     {
         var requiredFields = new (string Value, string Name)[]

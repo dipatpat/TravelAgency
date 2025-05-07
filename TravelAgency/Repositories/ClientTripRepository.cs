@@ -12,6 +12,7 @@ public class ClientTripRepository : IClientTripRepository
         _connectionString = config.GetConnectionString("DefaultConnection");
     }
 
+    //to implement 4. PUT /api/clients/{id}/trips/{tripId}
     public async Task RegisterClientForTripAsync(int tripId, int clientId, CancellationToken cancellationToken)
     {
         await using var con = new SqlConnection(_connectionString);
@@ -32,6 +33,8 @@ public class ClientTripRepository : IClientTripRepository
         await cmd.ExecuteNonQueryAsync(cancellationToken);
 
     }
+    // needed to validate if a client is registered for a trip, to avoid duplicate bookings
+    //and throw a relevant exception 
     public async Task<bool> IsClientRegisteredForTripAsync(int idClient, int idTrip,
         CancellationToken cancellationToken)
     {
@@ -47,6 +50,7 @@ public class ClientTripRepository : IClientTripRepository
         return count > 0;
     }
 
+    // to implement 5. DELETE /api/clients/{id}/trips/{tripId}
     public async Task RemoveClientFromTripAsync(int idTrip, int idClient, CancellationToken cancellationToken)
     {
         await using var con = new SqlConnection(_connectionString);

@@ -13,10 +13,11 @@ public class TripsRepository : ITripsRepository
         _connectionString = configuration.GetConnectionString("DefaultConnection");
         
     }
+    //to implement 1. GET /api/trips
     public async Task<IEnumerable<Trip>> GetTripsAsync(CancellationToken cancellationToken)
     {
-        await using var con = new SqlConnection(_connectionString); //establishing connection
-        await using var cmd = new SqlCommand(); //represents queries
+        await using var con = new SqlConnection(_connectionString); 
+        await using var cmd = new SqlCommand(); 
         cmd.Connection = con;
         cmd.CommandText = "SELECT  * FROM Trip";
         await con.OpenAsync(cancellationToken);
@@ -51,6 +52,8 @@ public class TripsRepository : ITripsRepository
         return trips;
     }
 
+    //to create a TripDTO with countries
+    //needed to implement 1. GET /api/trips
     public async Task<IEnumerable<string>> GetTripsCountriesAsync(CancellationToken cancellationToken, int tripId)
     {
         await using var con = new SqlConnection(_connectionString);
@@ -74,6 +77,9 @@ public class TripsRepository : ITripsRepository
         return countries;
     }
 
+    //needed to obtain a specific trip
+    //needed for 4. PUT /api/clients/{id}/trips/{tripId},
+    //5. DELETE /api/clients/{id}/trips/{tripId}
     public async Task<Trip> GetTripByIdAsync(int id, CancellationToken cancellationToken)
     {
         await using var con = new SqlConnection(_connectionString); 
@@ -109,6 +115,8 @@ public class TripsRepository : ITripsRepository
         return null;
     }
 
+    //needed to check if the trip is full to avoid overbooking and throw
+    //a relevant exception
     public async Task<int> GetTotalPeopleRegisteredForATripAsync(int tripId, CancellationToken cancellationToken)
     {
         await using var con = new SqlConnection(_connectionString);

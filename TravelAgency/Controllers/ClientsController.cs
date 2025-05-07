@@ -24,6 +24,9 @@ public class ClientsController : ControllerBase
         var trips = await _clientService.GetClientTripsAsync(cancellationToken, id);
         return Ok(trips);
     }
+    
+    //to be able to return the newly created client for 3. POST /api/clients 
+    //to be able to register client for a trip 4. PUT /api/clients/{id}/trips/{tripId}
     [HttpGet("{id}")]
     [ActionName("GetClientByIdAsync")]
     public async Task<IActionResult> GetClientByIdAsync(int id, CancellationToken cancellationToken)
@@ -32,6 +35,7 @@ public class ClientsController : ControllerBase
         return Ok(client);
     }
 
+    //to implement 3. POST /api/clients
     [HttpPost]
     public async Task<IActionResult> CreateClientAsync(CreateClientRequest request, CancellationToken cancellationToken)
     {
@@ -43,6 +47,7 @@ public class ClientsController : ControllerBase
             client);
     }
 
+    //to implement 4. PUT /api/clients/{id}/trips/{tripId}
     [HttpPut("{idClient}/trips/{tripId}")]
     public async Task<IActionResult> RegisterClientForTripAsync(int idClient, int tripId, CancellationToken cancellationToken)
     {
@@ -50,6 +55,7 @@ public class ClientsController : ControllerBase
         return Ok($"Client with id {idClient} has been registered for a trip with id {tripId}");
     }
     
+    //to implement 5. DELETE /api/clients/{id}/trips/{tripId}
     [HttpDelete("{idClient}/trips/{tripId}")]
     public async Task<IActionResult> UnRegisterClientForTripAsync(int idClient, int tripId, CancellationToken cancellationToken)
     {
@@ -57,6 +63,7 @@ public class ClientsController : ControllerBase
         return Ok($"Client with id {idClient} has been removed from a trip with id {tripId}");
     }
 
+    // to fulfill the requirements of using 501 code in the project 
     [HttpGet("future-feature")]
     public IActionResult NotImplementedFeature()
     {

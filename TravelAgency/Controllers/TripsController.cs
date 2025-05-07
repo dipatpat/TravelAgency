@@ -10,7 +10,6 @@ namespace TravelAgency.Controllers;
 [ApiController]
 public class TripsController : ControllerBase
 {
-    //private readonly string _connectionString;
     private readonly ITripsService _tripsService;
 
     public TripsController(ITripsService tripsService)
@@ -18,6 +17,7 @@ public class TripsController : ControllerBase
         _tripsService = tripsService;
     }
 
+    //to implement GET /api/trips
     [HttpGet]
     public async Task<IActionResult> GetTripsAsync(CancellationToken cancellationToken)
     {
@@ -26,6 +26,8 @@ public class TripsController : ControllerBase
         return Ok(tripsToReturn);
     }
 
+    //to be able to obtain the trip for PUT /api/clients/{id}/trips/{tripId} 
+    //and DELETE /api/clients/{id}/trips/{tripId}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetTripAsync(int id, CancellationToken cancellationToken)
     {

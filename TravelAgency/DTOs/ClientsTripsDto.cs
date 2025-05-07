@@ -9,7 +9,6 @@ public class ClientsTripsDto
     public DateTime? DepartureDate { get; set; }
     public DateTime? ArrivalDate { get; set; }
     
-    //public List<string> Countries { get; set; }
     public int registrationInformation  { get; set; }
     public int? paymentInformation { get; set; }
 }
