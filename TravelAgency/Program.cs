@@ -67,7 +67,7 @@ public class Program
             c.DocExpansion(DocExpansion.List);
             c.DefaultModelsExpandDepth(0); //Hide schemas section by default
             c.DisplayRequestDuration(); //Show request duration
-            c.EnableFilter(); //Enable filtering operration
+            c.EnableFilter(); //Enable filtering operation
         });
 
         app.UseHttpsRedirection();
