@@ -1,5 +1,4 @@
-**Travel Agency API
-**
+**Travel Agency API**
 This is a RESTful web API for managing clients and trips in a travel agency system. Built using ASP.NET Core and ADO.NET for database interactions with SQL Server.
 
 **Features**
@@ -14,8 +13,7 @@ Track registration and payment dates.
 
 Centralized error handling with appropriate HTTP status codes.
 
-**Technologies Used
-**
+**Technologies Used**
 ASP.NET Core 8
 
 ADO.NET with Microsoft.Data.SqlClient
@@ -44,8 +42,8 @@ GET /trips - Get all trips.
 
 GET /trips/{id} - Get trip details by ID.
 
-**Status Codes Used
-**
+**Status Codes Used**
+
 200 OK - Successful request.
 
 201 Created - Resource created.
@@ -60,14 +58,14 @@ GET /trips/{id} - Get trip details by ID.
 
 501 Not Implemented - Placeholder for future functionality.
 
-**Validation
-**
+**Validation**
+
 Input validation is done both at the model and service level.
 
 Custom exceptions are thrown for not found, conflict, and bad request scenarios.
 
-**Error Handling
-**
+**Error Handling**
+
 All exceptions are caught by a global exception handling middleware and returned as a consistent JSON error response:
 {
   "status": "Error",
@@ -76,7 +74,7 @@ All exceptions are caught by a global exception handling middleware and returned
   "stackTrace": "..."
 }
 
-Setup Instructions
+**Setup Instructions**
 
 Clone the repository.
 
@@ -88,6 +86,6 @@ Build and run the project.
 
 Open Swagger UI to test endpoints at /swagger.
 
-Author
+**Author**
 
 Developed by Patrycja Szpakowska for the APDB course.
